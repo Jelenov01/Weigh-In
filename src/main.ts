@@ -2,6 +2,7 @@ import "./style.css";
 import { deleteEntry, getEntries, getSettings, putEntries, putEntry, requestPersistence, saveSettings, type Entry, type Settings } from "./db";
 import { drawChart } from "./chart";
 import { initCalories } from "./calories";
+import { initFoodLog } from "./foodlog";
 import { toCsv, fromCsv } from "./csv";
 import { DAY, exampleData, fromUnit, toTs, todayStr, toUnit, weeklyRate, withTrend, type TrendRow } from "./stats";
 
@@ -9,7 +10,7 @@ const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getEleme
 
 const state: { entries: Entry[]; settings: Settings; range: number } = {
   entries: [],
-  settings: { unit: "lb", goalKg: null },
+  settings: { unit: "lb", goalKg: null, kcalTarget: null },
   range: 90,
 };
 
@@ -191,8 +192,7 @@ $<HTMLFormElement>("settingsForm").addEventListener("submit", async (ev) => {
   const raw = $<HTMLInputElement>("gWeight").value.trim();
   const goalKg = raw === "" ? null : roundKg(fromUnit(parseFloat(raw), unit()));
   if (goalKg !== null && !(goalKg > 0)) return;
-  state.settings = { ...state.settings, goalKg };
-  await saveSettings(state.settings);
+  state.settings = await saveSettings({ goalKg });
   flash(goalKg === null ? "Goal cleared." : `Goal set to ${raw} ${unit()}.`);
   render();
 });
@@ -203,7 +203,7 @@ document.querySelectorAll<HTMLButtonElement>("[data-unit]").forEach((b) =>
     if (u === unit()) return;
     state.settings = { ...state.settings, unit: u };
     syncGoalInput();
-    await saveSettings(state.settings);
+    state.settings = await saveSettings({ unit: u });
     render();
   }),
 );
@@ -273,6 +273,7 @@ window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
 async function init() {
   showTab(location.hash.slice(1));
   initCalories().catch(() => ($("foodMsg").textContent = "Saved foods couldn't be loaded from this browser's storage."));
+  initFoodLog().catch(() => ($("logEmpty").textContent = "The food log couldn't be loaded from this browser's storage."));
   const dateInput = $<HTMLInputElement>("fDate");
   dateInput.value = todayStr();
   dateInput.max = todayStr();

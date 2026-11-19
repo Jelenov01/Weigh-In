@@ -12,6 +12,7 @@ export interface Entry {
 export interface Settings {
   unit: Unit;
   goalKg: number | null;
+  kcalTarget: number | null;
 }
 
 export type AmountUnit = "serving" | "g" | "oz" | "ml";
@@ -31,21 +32,39 @@ export interface Food {
   uses: number;
 }
 
+export type Meal = "breakfast" | "lunch" | "dinner" | "snack";
+
+/** One food eaten on one day. Name and calories are copied in, so deleting a saved food leaves the log intact. */
+export interface LogItem {
+  id: string;
+  date: string; // YYYY-MM-DD, local
+  meal: Meal;
+  foodId: string;
+  name: string;
+  brand: string;
+  amount: number;
+  unit: AmountUnit;
+  kcal: number;
+  at: number;
+}
+
 interface WeighInDB extends DBSchema {
   entries: { key: string; value: Entry };
   settings: { key: string; value: Settings };
   foods: { key: string; value: Food };
+  foodLog: { key: string; value: LogItem; indexes: { date: string } };
 }
 
-const DEFAULT_SETTINGS: Settings = { unit: "lb", goalKg: null };
+const DEFAULT_SETTINGS: Settings = { unit: "lb", goalKg: null, kcalTarget: null };
 
-const dbPromise = openDB<WeighInDB>("weigh-in", 2, {
+const dbPromise = openDB<WeighInDB>("weigh-in", 3, {
   upgrade(db, oldVersion) {
     if (oldVersion < 1) {
       db.createObjectStore("entries", { keyPath: "date" });
       db.createObjectStore("settings");
     }
     if (oldVersion < 2) db.createObjectStore("foods", { keyPath: "id" });
+    if (oldVersion < 3) db.createObjectStore("foodLog", { keyPath: "id" }).createIndex("date", "date");
   },
 });
 
@@ -80,8 +99,12 @@ export async function getSettings(): Promise<Settings> {
   return { ...DEFAULT_SETTINGS, ...(await (await dbPromise).get("settings", "app")) };
 }
 
-export async function saveSettings(settings: Settings): Promise<void> {
-  await (await dbPromise).put("settings", settings, "app");
+/** Merge changes into the stored settings, so each tab only writes the fields it owns. */
+export async function saveSettings(patch: Partial<Settings>): Promise<Settings> {
+  const tx = (await dbPromise).transaction("settings", "readwrite");
+  const next = { ...DEFAULT_SETTINGS, ...(await tx.store.get("app")), ...patch };
+  await Promise.all([tx.store.put(next, "app"), tx.done]);
+  return next;
 }
 
 /** Saved foods, most recently used first. */
@@ -96,4 +119,18 @@ export async function putFood(food: Food): Promise<void> {
 
 export async function deleteFood(id: string): Promise<void> {
   await (await dbPromise).delete("foods", id);
+}
+
+/** Log items for dates from `from` to `to` inclusive, in the order they were added. */
+export async function getLog(from: string, to: string = from): Promise<LogItem[]> {
+  const items = await (await dbPromise).getAllFromIndex("foodLog", "date", IDBKeyRange.bound(from, to));
+  return items.sort((a, b) => a.at - b.at);
+}
+
+export async function putLogItem(item: LogItem): Promise<void> {
+  await (await dbPromise).put("foodLog", item);
+}
+
+export async function deleteLogItem(id: string): Promise<void> {
+  await (await dbPromise).delete("foodLog", id);
 }

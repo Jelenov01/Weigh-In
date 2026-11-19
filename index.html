@@ -96,6 +96,33 @@
       </div>
 
       <div class="view" id="view-calories" hidden>
+        <section class="card day">
+          <div class="day-head">
+            <h2>Food log</h2>
+            <div class="day-nav">
+              <button type="button" class="ghost" id="dayPrev" aria-label="Previous day">‹</button>
+              <span class="day-label" id="logDay">Today</span>
+              <button type="button" class="ghost" id="dayNext" aria-label="Next day">›</button>
+              <button type="button" class="ghost" id="dayToday" hidden>Today</button>
+            </div>
+          </div>
+          <div class="day-summary" aria-live="polite">
+            <div>
+              <div class="big"><span class="num" id="logTotal">0</span><small>kcal</small></div>
+              <div class="food-meta" id="logTarget"></div>
+            </div>
+            <div class="left-pill" id="logLeft" hidden></div>
+          </div>
+          <div class="progress" id="logBar" hidden><span></span></div>
+          <div class="food-meta" id="logAvg" hidden></div>
+          <div class="meals" id="logMeals"></div>
+          <p class="history-empty" id="logEmpty"></p>
+          <form class="target-form" id="targetForm" autocomplete="off">
+            <label>Daily calorie target<input type="number" id="tKcal" min="1" step="1" inputmode="numeric" placeholder="2000" /></label>
+            <button type="submit" class="ghost">Save target</button>
+          </form>
+        </section>
+
         <section class="top">
           <form class="card find" id="foodForm" autocomplete="off">
             <h2>Find a food</h2>
@@ -120,6 +147,16 @@
               <div class="big"><span id="cResult" class="num">—</span><small>kcal</small></div>
               <div class="food-meta" id="cBasis"></div>
               <div class="food-meta" id="cNote"></div>
+              <div class="calc-row add-row">
+                <label>Meal<select id="cMeal">
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                  <option value="snack">Snacks</option>
+                </select></label>
+                <button type="button" id="cAdd">Add to today</button>
+              </div>
+              <div class="form-msg" id="cAdded" role="status"></div>
             </div>
           </div>
         </section>

@@ -63,7 +63,9 @@ h2 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spa
 .delta { display: inline-flex; gap: 6px; font: 600 0.85rem var(--font-num); padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); width: fit-content; }
 .delta.up { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
 
-form.log { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* minmax(0, …) lets columns shrink below an input's built-in minimum width instead of squeezing or overflowing */
+form.log { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 480px) { form.log { grid-template-columns: minmax(0, 1fr); } }
 .full, .span { grid-column: 1 / -1; }
 label { display: grid; gap: 4px; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
 input[type="number"], input[type="date"], input[type="text"] {
@@ -78,6 +80,9 @@ input[type="number"], input[type="date"], input[type="text"] {
   min-height: 44px;
 }
 input[type="number"] { font-family: var(--font-num); }
+/* iOS Safari draws date inputs with their own size and centered text unless the native look is turned off */
+input[type="date"] { -webkit-appearance: none; appearance: none; display: block; text-align: left; }
+input[type="date"]::-webkit-date-and-time-value { text-align: left; }
 input:focus-visible, button:focus-visible, .file-btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 button, .file-btn {
@@ -128,7 +133,7 @@ button:hover { filter: brightness(1.08); }
 .stat dd { margin: 0; font: 600 0.95rem var(--font-num); text-align: right; }
 .progress { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 6px 0 4px; }
 .progress span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
-.settings { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.settings { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
 
 .history { margin-top: 12px; max-height: 460px; overflow: auto; }
 table { width: 100%; border-collapse: collapse; }
@@ -152,7 +157,8 @@ td.act { text-align: right; white-space: nowrap; }
 .calc { display: grid; gap: 12px; align-content: start; }
 .calc-body { display: grid; gap: 12px; }
 .calc-empty { color: var(--muted); margin: 0; }
-.calc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.calc-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.add-row { align-items: end; }
 .calc .big { font: 600 clamp(2.4rem, 8vw, 3.2rem)/1 var(--font-num); letter-spacing: -0.03em; }
 .calc .big small { font-size: 0.35em; color: var(--muted); letter-spacing: 0; margin-left: 6px; }
 select {
@@ -190,4 +196,25 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .manual { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
 .manual summary { cursor: pointer; font-weight: 600; color: var(--accent); }
-.manual-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.manual-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+
+/* Food log */
+.day { display: grid; gap: 12px; }
+.day-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.day-nav { display: flex; align-items: center; gap: 6px; }
+.day-nav .ghost { min-width: 40px; font-size: 1rem; }
+.day-label { font-weight: 700; min-width: 7.5em; text-align: center; }
+.day-summary { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.day .big { font: 600 clamp(2.4rem, 8vw, 3.2rem)/1 var(--font-num); letter-spacing: -0.03em; }
+.day .big small { font-size: 0.35em; color: var(--muted); letter-spacing: 0; margin-left: 6px; }
+.left-pill { font: 600 0.9rem var(--font-num); padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.left-pill.over { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+.progress.over span { background: var(--bad); }
+.meals { display: grid; gap: 14px; }
+.meal-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+.meal-head h3 { margin: 0; font-size: 0.95rem; }
+.meal-head .num { font-size: 0.85rem; color: var(--muted); }
+.log-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.log-what { flex: 1; min-width: 0; display: grid; }
+.log-kcal { font-weight: 600; white-space: nowrap; }
+.target-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; padding-top: 12px; border-top: 1px solid var(--line); }

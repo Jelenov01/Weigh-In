@@ -1,5 +1,8 @@
 import { deleteFood, getFoods, putFood, type AmountUnit, type Food } from "./db";
 import { availableUnits, calories, describeFood, newFood, searchFoods, UNIT_LABELS } from "./food";
+import { addToLog, dayLabel, defaultMeal, formatAmount, MEALS, viewedDay } from "./foodlog";
+import type { Meal } from "./db";
+import { todayStr } from "./stats";
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -75,7 +78,29 @@ function renderCalc() {
   unitSel.replaceChildren(...units.map((u) => new Option(UNIT_LABELS[u], u)));
   unitSel.value = selected.lastUnit;
   $<HTMLInputElement>("cAmount").value = String(selected.lastAmount);
+  if (viewedDay() === todayStr()) $<HTMLSelectElement>("cMeal").value = defaultMeal();
+  $("cAdded").textContent = "";
+  updateAddLabel();
   updateResult();
+}
+
+function updateAddLabel() {
+  $("cAdd").textContent = `Add to ${dayLabel()}`;
+}
+
+async function onAdd() {
+  if (!selected) return;
+  const amount = parseFloat($<HTMLInputElement>("cAmount").value);
+  const unit = $<HTMLSelectElement>("cUnit").value as AmountUnit;
+  const kcal = calories(selected, amount, unit);
+  if (kcal === null || !(amount > 0)) {
+    $("cAdded").textContent = "Enter an amount first.";
+    return;
+  }
+  const meal = $<HTMLSelectElement>("cMeal").value as Meal;
+  await addToLog(selected, amount, unit, kcal, meal);
+  const mealLabel = MEALS.find((m) => m.id === meal)!.label.toLowerCase();
+  $("cAdded").textContent = `Added ${formatAmount(amount, unit)} of ${selected.name} (${Math.round(kcal)} kcal) to ${mealLabel}, ${dayLabel()}.`;
 }
 
 function updateResult() {
@@ -203,6 +228,8 @@ export async function initCalories(): Promise<void> {
     updateResult();
     rememberAmount();
   });
+  $("cAdd").addEventListener("click", onAdd);
+  document.addEventListener("logdaychange", updateAddLabel);
   renderResults();
   renderCalc();
   await reloadSaved();
