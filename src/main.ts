@@ -3,6 +3,9 @@ import { deleteEntry, getEntries, getSettings, putEntries, putEntry, requestPers
 import { drawChart } from "./chart";
 import { initCalories } from "./calories";
 import { initFoodLog } from "./foodlog";
+import { initPwa } from "./pwa";
+
+initPwa();
 import { toCsv, fromCsv } from "./csv";
 import { DAY, exampleData, fromUnit, toTs, todayStr, toUnit, weeklyRate, withTrend, type TrendRow } from "./stats";
 

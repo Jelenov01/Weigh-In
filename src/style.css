@@ -218,3 +218,22 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .log-what { flex: 1; min-width: 0; display: grid; }
 .log-kcal { font-weight: 600; white-space: nowrap; }
 .target-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* Update bar, pinned above the bottom safe area */
+.update-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px max(16px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 500;
+}
+.update-bar button { min-height: 36px; padding: 6px 14px; }

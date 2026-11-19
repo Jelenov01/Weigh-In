@@ -6,7 +6,8 @@ export default defineConfig({
   base: "./",
   plugins: [
     VitePWA({
-      registerType: "autoUpdate",
+      // "prompt" lets src/pwa.ts decide when to switch versions instead of reloading mid-task.
+      registerType: "prompt",
       includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png", "icon.svg"],
       manifest: {
         name: "Weigh-In",
