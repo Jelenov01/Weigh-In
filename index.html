@@ -35,7 +35,7 @@
 
         <form class="card log" id="logForm" autocomplete="off">
           <label>Date<input type="date" id="fDate" required /></label>
-          <label>Weight (<span class="unitLbl">lb</span>)<input type="number" id="fWeight" step="0.1" min="40" max="1000" inputmode="decimal" placeholder="185.4" required /></label>
+          <label><span>Weight (<span class="unitLbl">lb</span>)</span><input type="number" id="fWeight" step="0.1" min="40" max="1000" inputmode="decimal" placeholder="185.4" required /></label>
           <label class="full">Note (optional)<input type="text" id="fNote" maxlength="140" placeholder="After workout, salty dinner, etc." /></label>
           <button type="submit" class="full">Log weight</button>
           <div class="form-msg full" id="formMsg" role="status"></div>
@@ -68,7 +68,7 @@
           <h2>Summary</h2>
           <dl class="stats" id="stats"></dl>
           <form class="settings" id="settingsForm">
-            <label>Goal weight (<span class="unitLbl">lb</span>)<input type="number" id="gWeight" step="0.1" min="40" max="1000" inputmode="decimal" placeholder="170" /></label>
+            <label><span>Goal weight (<span class="unitLbl">lb</span>)</span><input type="number" id="gWeight" step="0.1" min="40" max="1000" inputmode="decimal" placeholder="170" /></label>
             <button type="submit">Save goal</button>
             <div class="seg span" role="group" aria-label="Units">
               <button type="button" data-unit="lb" aria-pressed="true">Pounds</button>
